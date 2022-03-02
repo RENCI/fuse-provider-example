@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  fuse-provider-example:
+    container_name: fuse-provider-example
+    build: .
+    restart: always
+    env_file: .env
+    ports:
+        - ${API_PORT}:8000
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - ./config/service_info.json:/app/service_info.json
+    expose:
+      - ${API_PORT}
+

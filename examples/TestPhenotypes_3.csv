@@ -1,0 +1,4 @@
+participant_id,study_time_collected,study_time_collected_unit,cohort,cohort_type,biosample_accession,exposure_material_reported,exposure_process_preferred
+SUB205414.1529,84,Days,healthy aldults,healthy aldults_Whole blood,BS1028469,YF-Vax,vaccination
+SUB205393.1529,3,Days,healthy aldults,healthy aldults_Whole blood,BS1028402,YF-Vax,vaccination
+SUB168243.787,2,Months,aP vaccinated individuals,aP vaccinated individuals_T cell,BS983543,NA,NA
