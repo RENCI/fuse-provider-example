@@ -122,27 +122,25 @@ class ExampleMetadata(ProviderExampleObject):
     version: str = "1.0"
     access_methods: List[AccessMethods] = [
         {
-            "type": "s3",
+            "type": "GET",
             "access_url": {
-                "url": "string",
-                "headers": "Authorization: Basic Z2E0Z2g6ZHJz"
+                "url": "http://localhost:8083/files/examples_zip"
             },
-            "access_id": "string",
-            "region": "us-east-1"
         }
     ]
     contents: List[Contents] = [
         {
-            "name": "string",
-            "id": "string",
+            "name": "HPA.csv",
+            "id": "HPA.csv",
             "drs_uri": "drs://drs.example.org/314159",
-            "contents": [
-                "string"
-            ]
+        },
+        {
+            "name": "TestPhenotypes_3.csv",
+            "id": "TestPhenotypes_3.csv",
+            "drs_uri": "drs://drs.example.org/314159",
         }
     ]
-    description: str="string"
-    aliases: List[str] = [ "string" ]
+    description: str="Example data files"
 
 
 

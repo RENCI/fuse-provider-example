@@ -4,6 +4,7 @@ from fastapi import FastAPI, Depends, Path, Query, Body
 from fastapi.logger import logger
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import StreamingResponse
+from fastapi.responses import FileResponse
 from typing import List
 from bson.json_util import dumps, loads
 from zipfile import ZipFile
@@ -73,7 +74,61 @@ async def objects(object_id: str = Path(default="", description="DrsObject ident
     Returns object metadata, and a list of access methods that can be used to fetch object bytes.
     '''
     example_object = ExampleMetadata()
+    example_object.access_methods = [
+        {
+            "type": "GET",
+            "access_url": {
+                "url": "http://localhost:8083/files/" + object_id
+            },
+        }
+    ]
+
+    if not object_id == "exampleszip.zip":
+        example_object.contents =  [
+            {
+                "name": object_id,
+                "id": object_id,
+                "drs_uri": "drs://drs.example.org/314159",
+            }
+        ]
+    else:
+        example_object.contents =  [
+            {
+                "name": "HPA.csv",
+                "id": "HPA.csv",
+                "drs_uri": "drs://drs.example.org/314159",
+            },
+            {
+                "name": "TestPhenotypes_3.csv",
+                "id": "TestPhenotypes_3.csv",
+                "drs_uri": "drs://drs.example.org/314159",
+            }
+        ]
+
     return example_object.dict()
+
+# @app.get("/files/{file_name}", summary="Get file.")
+# async def files(file_name: str = Path(default="", description="File name")):
+#     '''
+#     Returns file metadata, and a list of access methods that can be used to fetch the file.
+#     :param file_name:
+#     :return:
+#     '''
+#     dir_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "examples")
+#     file_path = os.path.join(dir_path, file_name)
+#     # return FileResponse(file_path)
+#     def iterfile():
+#         try:
+#             with open(file_path, mode="rb") as file_data:
+#                 yield from file_data
+#         except:
+#             raise Exception()
+#
+#     response = StreamingResponse(iterfile(), media_type="application/zip")
+#     response.headers["Content-Disposition"] = "attachment; filename=examples"
+#     return response
+
+
 
 # xxx add value for passport example that doesn't cause server error
 # xxx figure out how to add the following description to 'passports':
@@ -102,11 +157,11 @@ async def get_objects(object_id: str=Path(default="", description="DrsObject ide
 
 
     return {
-        "url": "http://fuse-provider-example:8083/results/examples_zip",
+        "url": "http://localhost:8083/files/" + object_id,
         "headers": "Authorization: None"
     }
 
-@app.get("/results/{object_id}", summary="Get a URL for fetching bytes")
+@app.get("/files/{object_id}", summary="Get a URL for fetching bytes")
 async def get_examples(object_id: str):
     examples_zip_path = pathlib.Path('exampleszip')
     if not examples_zip_path.exists():
@@ -117,14 +172,25 @@ async def get_examples(object_id: str):
         ezip.write(os.path.join(local_path, f"TestPhenotypes_3.csv"), 'TestPhenotypes_3.csv')
         # ezip.printdir()
         ezip.close()
+
+    if not (object_id == 'exampleszip.zip'):
+        dir_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "examples")
+        local_path = os.path.join(dir_path, object_id)
+        file_type = "text/csv"
+    else:
+        local_path = object_id
+        file_type = "application/zip"
+
     def iterfile():
         try:
-            with open('exampleszip', mode="rb") as file_data:
+            with open(local_path, mode="rb") as file_data:
                 yield from file_data
         except:
             raise Exception()
 
-    response = StreamingResponse(iterfile(), media_type="application/zip")
+
+
+    response = StreamingResponse(iterfile(), media_type=file_type)
     response.headers["Content-Disposition"] = "attachment; filename=examples"
     return response
 
